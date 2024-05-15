@@ -4,7 +4,7 @@
  */
 package cps4005;
 
-import java.util.Date;
+import java.sql.Date;
 
 /**
  *
