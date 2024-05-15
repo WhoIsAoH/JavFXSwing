@@ -93,137 +93,143 @@ private void populateDataIntoTables() {
             }
         }
 
-        System.out.println("Data populated into tables successfully.");
+      System.out.println("Data populated into tables successfully.");
     } catch (SQLException e) {
-        System.out.println("Error populating data into tables: " + e.getMessage());
+      System.out.println("Error populating data into tables: " + e.getMessage());
     }
-}
+  }
 
-    public void dbClose(){
-        try{
-            if(connection != null)
-                connection.close();
-        }catch(SQLException e){
-            System.out.println("Error closing the database conenction"+e.getMessage());
-        }
+  public void dbClose() {
+    try {
+      if (connection != null)
+        connection.close();
+    } catch (SQLException e) {
+      System.out.println("Error closing the database conenction" + e.getMessage());
     }
-    
-    //client connection with db
-    public void addClient(String name, String address,String phone, String email) throws SQLException {
-        String sql = "insert into clients(client_name,client_address, client_phone, client_email) values(?,?,?,?)";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setString(1, name);
-            pstmt.setString(2, address);
-            pstmt.setString(3, phone);
-            pstmt.setString(4, email);
-            pstmt.executeUpdate();
-        }
+  }
+
+  //client connection with db
+  public void addClient(String name, String address, String phone, String email) throws SQLException {
+    String sql = "insert into clients(client_name,client_address, client_phone, client_email) values(?,?,?,?)";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setString(1, name);
+      pstmt.setString(2, address);
+      pstmt.setString(3, phone);
+      pstmt.setString(4, email);
+      pstmt.executeUpdate();
     }
-    
-    public Client getClient(int id) throws SQLException{
-        String sql = "select * from clients where client_id =?";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if(rs.next()){
-                return new Client(rs.getInt("client_id"),rs.getString("client_name"),
-                        rs.getString("client_address"), rs.getString("Client_phone"),
-                            rs.getString("client_email"));
-            }
-        }
-        return null;
+  }
+
+  public Client getClient(int id) throws SQLException {
+    String sql = "select * from clients where client_id =?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setInt(1, id);
+      ResultSet rs = pstmt.executeQuery();
+      if (rs.next()) {
+        return new Client(rs.getInt("client_id"), rs.getString("client_name"),
+                rs.getString("client_address"), rs.getString("Client_phone"),
+                rs.getString("client_email"));
+      }
     }
-    
-    public List<Client> getAllClients() throws SQLException{
-        List<Client> clients = new ArrayList<>();
-        String sql = "select * from clients";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            ResultSet rs = pstmt.executeQuery();
-            while(rs.next()){
-                int id = rs.getInt("client_id");
-                String name = rs.getString("client_name");
-                String address = rs.getString("client_address");
-                String phone = rs.getString("client_phone");
-                String email = rs.getString("client_email");
-                clients.add(new Client(id,name,address,phone,email));
-            }
-        }
-        return clients;
+    return null;
+  }
+
+  public List<Client> getAllClients() throws SQLException {
+    List<Client> clients = new ArrayList<>();
+    String sql = "select * from clients";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        int id = rs.getInt("client_id");
+        String name = rs.getString("client_name");
+        String address = rs.getString("client_address");
+        String phone = rs.getString("client_phone");
+        String email = rs.getString("client_email");
+        clients.add(new Client(id, name, address, phone, email));
+      }
     }
-    
-    public void updateClient(int id, String newName, String newAddress, String newPhone, String newEmail) throws SQLException {
-        String sql = "update clients set client_name = ?, client_address = ?,client_phone = ?,client_email = ?, where client_id = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setString(1, newName);
-            pstmt.setString(2, newAddress);
-            pstmt.setString(3, newPhone);
-            pstmt.setString(4, newEmail);
-            pstmt.setInt(5, id);
-            pstmt.executeUpdate();
-        }
+    return clients;
+  }
+
+  public void updateClient(int id, String newName, String newAddress, String newPhone, String newEmail) throws SQLException {
+    String sql = "update clients set client_name = ?, client_address = ?,client_phone = ?,client_email = ?, where client_id = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setString(1, newName);
+      pstmt.setString(2, newAddress);
+      pstmt.setString(3, newPhone);
+      pstmt.setString(4, newEmail);
+      pstmt.setInt(5, id);
+      pstmt.executeUpdate();
     }
-    
-    public void deleteClient(int id) throws SQLException{
-        String sql = "delete from clients where client_id = ?";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setInt(1, id);
-            pstmt.executeUpdate();
-        }
+  }
+
+  public void deleteClient(int id) throws SQLException {
+    String sql = "delete from clients where client_id = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setInt(1, id);
+      pstmt.executeUpdate();
     }
-    
-    //case connection with db
-    public void addCase(String number,String title,String description,String status,String dateFiled, String dateClosed, int clientId) throws SQLException {
-        String sql = "INSERT INTO cases (case_number, case_title, case_description, case_status, date_filed, date_closed, client_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setString(1, number);
-            pstmt.setString(2, title);
-            pstmt.setString(3, description);
-            pstmt.setString(4, status);
-            pstmt.setDate(5, java.sql.Date.valueOf(dateFiled));
-            pstmt.setDate(6, java.sql.Date.valueOf(dateClosed));
-            pstmt.setInt(7, clientId);
-            pstmt.executeUpdate();
-        }
+  }
+
+  //case connection with db
+  public void addCase(String number, String title, String description, String status, String dateFiled, String dateClosed, int clientId) throws SQLException {
+    String sql = "INSERT INTO cases (case_number, case_title, case_description, case_status, date_filed, date_closed, client_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setString(1, number);
+      pstmt.setString(2, title);
+      pstmt.setString(3, description);
+      pstmt.setString(4, status);
+      pstmt.setDate(5, java.sql.Date.valueOf(dateFiled));
+      pstmt.setDate(6, java.sql.Date.valueOf(dateClosed));
+      pstmt.setInt(7, clientId);
+      pstmt.executeUpdate();
     }
-    
-    public Case getCase(int id) throws SQLException{
-        String sql = "select * from cases where case_id =?";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setInt(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            if(rs.next()){
-            int clientId = rs.getInt("client_id");
-            Client client = getClient(clientId);
-                return new Case(rs.getInt("case_id"), rs.getString("case_number"),
-                    rs.getString("case_title"), rs.getString("case_description"),
-                    rs.getString("case_status"), rs.getDate("date_filed"),
-                    rs.getDate("date_closed"),client);
-            }
-        }
-        return null;
+  }
+
+  public Case getCase(int id) throws SQLException {
+    String sql = "select * from cases where case_id =?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setInt(1, id);
+      ResultSet rs = pstmt.executeQuery();
+      if (rs.next()) {
+        int clientId = rs.getInt("client_id");
+        Client client = getClient(clientId);
+        return new Case(rs.getInt("case_id"), rs.getString("case_number"),
+                rs.getString("case_title"), rs.getString("case_description"),
+                rs.getString("case_status"), rs.getDate("date_filed"),
+                rs.getDate("date_closed"), client);
+      }
     }
-    
-    public List<Case> getAllCases() throws SQLException{
-        List<Case> cases = new ArrayList<>();
-        String sql = "select * from cases";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            ResultSet rs = pstmt.executeQuery();
-            while(rs.next()){
-                int caseId = rs.getInt("case_id");
-            String caseNumber = rs.getString("case_number");
-            String caseTitle = rs.getString("case_title");
-            String caseDescription = rs.getString("case_description");
-            String caseStatus = rs.getString("case_status");
-            Date dateFiled = rs.getDate("date_filed");
-            Date dateClosed = rs.getDate("date_closed");
-            int clientId = rs.getInt("client_id");
-            Client client = getClient(clientId);
-            cases.add(new Case(caseId, caseNumber, caseTitle, caseDescription, caseStatus, dateFiled, dateClosed, client));            }
-        }
-        return cases;
+    return null;
+  }
+
+  public List<Case> getAllCases() throws SQLException {
+    List<Case> cases = new ArrayList<>();
+    String sql = "select * from cases";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      ResultSet rs = pstmt.executeQuery();
+      while (rs.next()) {
+        int caseId = rs.getInt("case_id");
+        String caseNumber = rs.getString("case_number");
+        String caseTitle = rs.getString("case_title");
+        String caseDescription = rs.getString("case_description");
+        String caseStatus = rs.getString("case_status");
+
+        String dateFiledText = rs.getString("date_filed");
+        String dateClosedText = rs.getString("date_closed");
+
+        Date dateFiled = new Date(Long.parseLong(dateFiledText));
+        Date dateClosed = new Date(Long.parseLong(dateClosedText));
+
+        int clientId = rs.getInt("client_id");
+        Client client = getClient(clientId);
+        cases.add(new Case(caseId, caseNumber, caseTitle, caseDescription, caseStatus, dateFiled, dateClosed, client));
+      }
     }
-    
-    public void updateCase(int id, String newCaseNumber, String newCaseTitle, String newCaseDescription, String newCaseStatus, Date newDateFiled, Date newDateClosed) throws SQLException {
+    return cases;
+  }
+
+  public void updateCase(int id, String newCaseNumber, String newCaseTitle, String newCaseDescription, String newCaseStatus, Date newDateFiled, Date newDateClosed) throws SQLException {
     String sql = "UPDATE cases SET case_number = ?, case_title = ?, case_description = ?, case_status = ?, date_filed = ?, date_closed = ? WHERE case_id = ?";
         try(PreparedStatement pstmt = connection.prepareStatement(sql)){
             pstmt.setString(1, newCaseNumber);
@@ -240,14 +246,12 @@ private void populateDataIntoTables() {
     public void deleteCase(int id) throws SQLException {
     String sql = "DELETE FROM cases WHERE case_id = ?";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-        pstmt.setInt(1, id);
-        pstmt.executeUpdate();
+      pstmt.setInt(1, id);
+      pstmt.executeUpdate();
     }
+  }
+
+
 }
-    
-    
-        
-        
-    }
     
 
