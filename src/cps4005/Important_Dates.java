@@ -10,13 +10,13 @@ import java.sql.Date;
  *
  * @author ajayp
  */
-public class Data {
+public class Important_Dates {
     private int date_id;
-    private int case_id;
+    private Case case_id;
     private Date event_date;
     private String event_description;
 
-    public Data(int date_id, int case_id, Date event_date, String event_description) {
+    public Important_Dates(int date_id, Case case_id, Date event_date, String event_description) {
         this.date_id = date_id;
         this.case_id = case_id;
         this.event_date = event_date;
@@ -31,11 +31,11 @@ public class Data {
         this.date_id = date_id;
     }
 
-    public int getCase_id() {
+    public Case getCase_id() {
         return case_id;
     }
 
-    public void setCase_id(int case_id) {
+    public void setCase_id(Case case_id) {
         this.case_id = case_id;
     }
 

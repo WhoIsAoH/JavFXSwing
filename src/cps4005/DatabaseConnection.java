@@ -107,6 +107,16 @@ private void populateDataIntoTables() {
       System.out.println("Error closing the database conenction" + e.getMessage());
     }
   }
+  
+  //parseDate
+  private Date parseDate(String dateString) {
+        try {
+            return new Date(Long.parseLong(dateString));
+        } catch (NumberFormatException e) {
+            e.printStackTrace(); // Handle parsing exception
+            return null;
+        }
+    }
 
   //client connection with db
   public void addClient(String name, String address, String phone, String email) throws SQLException {
@@ -152,7 +162,7 @@ private void populateDataIntoTables() {
   }
 
   public void updateClient(int id, String newName, String newAddress, String newPhone, String newEmail) throws SQLException {
-    String sql = "update clients set client_name = ?, client_address = ?,client_phone = ?,client_email = ?, where client_id = ?";
+    String sql = "update clients set client_name = ?, client_address = ?,client_phone = ?,client_email = ? where client_id = ?";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
       pstmt.setString(1, newName);
       pstmt.setString(2, newAddress);
@@ -187,47 +197,56 @@ private void populateDataIntoTables() {
   }
 
   public Case getCase(int id) throws SQLException {
-    String sql = "select * from cases where case_id =?";
+    String sql = "select * from cases where case_id = ?";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-      pstmt.setInt(1, id);
-      ResultSet rs = pstmt.executeQuery();
-      if (rs.next()) {
-        int clientId = rs.getInt("client_id");
-        Client client = getClient(clientId);
-        return new Case(rs.getInt("case_id"), rs.getString("case_number"),
-                rs.getString("case_title"), rs.getString("case_description"),
-                rs.getString("case_status"), rs.getDate("date_filed"),
-                rs.getDate("date_closed"), client);
-      }
+        pstmt.setInt(1, id);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            int caseId = rs.getInt("case_id");
+            String caseNumber = rs.getString("case_number");
+            String caseTitle = rs.getString("case_title");
+            String caseDescription = rs.getString("case_description");
+            String caseStatus = rs.getString("case_status");
+
+            String dateFiledText = rs.getString("date_filed");
+            String dateClosedText = rs.getString("date_closed");
+
+            Date dateFiled = parseDate(dateFiledText);
+            Date dateClosed = parseDate(dateClosedText);
+
+            int clientId = rs.getInt("client_id");
+            Client client = getClient(clientId);
+            return new Case(caseId, caseNumber, caseTitle, caseDescription, caseStatus, dateFiled, dateClosed, client);
+        }
     }
     return null;
-  }
+}
 
-  public List<Case> getAllCases() throws SQLException {
+public List<Case> getAllCases() throws SQLException {
     List<Case> cases = new ArrayList<>();
     String sql = "select * from cases";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-      ResultSet rs = pstmt.executeQuery();
-      while (rs.next()) {
-        int caseId = rs.getInt("case_id");
-        String caseNumber = rs.getString("case_number");
-        String caseTitle = rs.getString("case_title");
-        String caseDescription = rs.getString("case_description");
-        String caseStatus = rs.getString("case_status");
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            int caseId = rs.getInt("case_id");
+            String caseNumber = rs.getString("case_number");
+            String caseTitle = rs.getString("case_title");
+            String caseDescription = rs.getString("case_description");
+            String caseStatus = rs.getString("case_status");
 
-        String dateFiledText = rs.getString("date_filed");
-        String dateClosedText = rs.getString("date_closed");
+            String dateFiledText = rs.getString("date_filed");
+            String dateClosedText = rs.getString("date_closed");
 
-        Date dateFiled = new Date(Long.parseLong(dateFiledText));
-        Date dateClosed = new Date(Long.parseLong(dateClosedText));
+            Date dateFiled = parseDate(dateFiledText);
+            Date dateClosed = parseDate(dateClosedText);
 
-        int clientId = rs.getInt("client_id");
-        Client client = getClient(clientId);
-        cases.add(new Case(caseId, caseNumber, caseTitle, caseDescription, caseStatus, dateFiled, dateClosed, client));
-      }
+            int clientId = rs.getInt("client_id");
+            Client client = getClient(clientId);
+            cases.add(new Case(caseId, caseNumber, caseTitle, caseDescription, caseStatus, dateFiled, dateClosed, client));
+        }
     }
     return cases;
-  }
+}
 
   public void updateCase(int id, String newCaseNumber, String newCaseTitle, String newCaseDescription, String newCaseStatus, Date newDateFiled, Date newDateClosed) throws SQLException {
     String sql = "UPDATE cases SET case_number = ?, case_title = ?, case_description = ?, case_status = ?, date_filed = ?, date_closed = ? WHERE case_id = ?";
@@ -251,6 +270,138 @@ private void populateDataIntoTables() {
     }
   }
 
+    
+    //date case
+    public void addDate(int caseId, Date eventDate, String eventDescription) throws SQLException {
+        String sql = "INSERT INTO important_dates (case_id, event_date, event_description) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, caseId);
+            pstmt.setDate(2, new java.sql.Date(eventDate.getTime()));
+            pstmt.setString(3, eventDescription);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public void updateDate(int dataId, int caseId, Date eventDate, String eventDescription) throws SQLException {
+        String sql = "UPDATE important_dates SET case_id = ?, event_date = ?, event_description = ? WHERE date_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, caseId);
+            pstmt.setDate(2, new java.sql.Date(eventDate.getTime()));
+            pstmt.setString(3, eventDescription);
+            pstmt.setInt(4, dataId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    public Important_Dates viewDate(int dataId) throws SQLException {
+        String sql = "SELECT * FROM important_dates WHERE date_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, dataId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Date eventDate = parseDate(rs.getString("event_date"));
+                String eventDescription = rs.getString("event_description");
+                int caseId = rs.getInt("case_id");
+                Case clientCase = getCase(caseId);
+                return new Important_Dates(dataId, clientCase, eventDate, eventDescription);
+            }
+        }
+        return null;
+    }
+
+    public List<Important_Dates> viewAllDate() throws SQLException {
+        List<Important_Dates> dataList = new ArrayList<>();
+        String sql = "SELECT * FROM important_dates";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                int dataId = rs.getInt("date_id");
+                int caseId = rs.getInt("case_id");
+                Case clientCase = getCase(caseId);
+                Date eventDate = parseDate(rs.getString("event_date"));
+                String eventDescription = rs.getString("event_description");
+                dataList.add(new Important_Dates(dataId, clientCase, eventDate, eventDescription));
+            }
+        }
+        return dataList;
+    }
+
+    public void deleteDate(int dataId) throws SQLException {
+        String sql = "DELETE FROM important_dates WHERE date_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, dataId);
+            pstmt.executeUpdate();
+        }
+    }
+    
+    //document
+    public void addDocument(int caseId, String documentName, String documentType, String documentPath) throws SQLException {
+    String sql = "INSERT INTO documents (case_id, document_name, document_type, document_path) VALUES (?, ?, ?, ?)";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setInt(1, caseId);
+        pstmt.setString(2, documentName);
+        pstmt.setString(3, documentType);
+        pstmt.setString(4, documentPath);
+        pstmt.executeUpdate();
+    }
+}
+
+    public void updateDocument(int documentId, int caseId, String documentName, String documentType, String documentPath) throws SQLException {
+    String sql = "UPDATE documents SET case_id = ?, document_name = ?, document_type = ?, document_path = ? WHERE document_id = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setInt(1, caseId);
+        pstmt.setString(2, documentName);
+        pstmt.setString(3, documentType);
+        pstmt.setString(4, documentPath);
+        pstmt.setInt(5, documentId);
+        pstmt.executeUpdate();
+    }
+}
+
+public Documents viewDocument(int documentId) throws SQLException {
+    String sql = "SELECT * FROM documents WHERE document_id = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setInt(1, documentId);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            int caseId = rs.getInt("case_id");
+            Case clientCase = getCase(caseId);
+            String documentName = rs.getString("document_name");
+            String documentType = rs.getString("document_type");
+            String documentPath = rs.getString("document_path");
+            return new Documents(documentId, clientCase, documentName, documentType, documentPath);
+        }
+    }
+    return null;
+}
+
+public List<Documents> viewAllDocuments() throws SQLException {
+    List<Documents> documentList = new ArrayList<>();
+    String sql = "SELECT * FROM documents";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        ResultSet rs = pstmt.executeQuery();
+        while (rs.next()) {
+            int documentId = rs.getInt("document_id");
+            int caseId = rs.getInt("case_id");
+            Case clientCase = getCase(caseId);
+            String documentName = rs.getString("document_name");
+            String documentType = rs.getString("document_type");
+            String documentPath = rs.getString("document_path");
+            documentList.add(new Documents(documentId, clientCase, documentName, documentType, documentPath));
+        }
+    }
+    return documentList;
+}
+
+public void deleteDocument(int documentId) throws SQLException {
+    String sql = "DELETE FROM documents WHERE document_id = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setInt(1, documentId);
+        pstmt.executeUpdate();
+    }
+}
+
+    
 
 }
     

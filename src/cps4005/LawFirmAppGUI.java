@@ -220,23 +220,39 @@ public class LawFirmAppGUI extends JFrame {
     }
 
     private void viewCase(int caseId) {
-        try {
-            Case caseObj = connection.getCase(caseId);
-            if (caseObj != null) {
-                outputArea.setText("Case ID: " + caseObj.getCase_id() + "\n" +
-                        "Case Number: " + caseObj.getCase_number() + "\n" +
-                        "Title: " + caseObj.getCase_title() + "\n" +
-                        "Description: " + caseObj.getCase_description() + "\n" +
-                        "Status: " + caseObj.getCase_status() + "\n" +
-                        "Date Filed: " + caseObj.getDate_filed() + "\n" +
-                        "Date Closed: " + caseObj.getDate_closed() + "\n");
+    try {
+        Case caseObj = connection.getCase(caseId);
+        if (caseObj != null) {
+            StringBuilder output = new StringBuilder();
+            output.append("Case ID: ").append(caseObj.getCase_id()).append("\n");
+            output.append("Case Number: ").append(caseObj.getCase_number()).append("\n");
+            output.append("Title: ").append(caseObj.getCase_title()).append("\n");
+            output.append("Description: ").append(caseObj.getCase_description()).append("\n");
+            output.append("Status: ").append(caseObj.getCase_status()).append("\n");
+            output.append("Date Filed: ").append(caseObj.getDate_filed()).append("\n");
+            output.append("Date Closed: ").append(caseObj.getDate_closed()).append("\n");
+               System.out.println(caseObj.getClient_id());
+            // Get the associated client
+            Client client = caseObj.getClient_id();
+            if (client != null) {
+                output.append("Client Information:\n");
+                output.append("Client ID: ").append(client.getClient_id()).append("\n");
+                output.append("Name: ").append(client.getClient_name()).append("\n");
+                output.append("Address: ").append(client.getClient_address()).append("\n");
+                output.append("Phone: ").append(client.getClient_phone()).append("\n");
+                output.append("Email: ").append(client.getClient_email()).append("\n");
             } else {
-                outputArea.setText("Case not found with ID: " + caseId);
+                output.append("No client information found for this case.\n");
             }
-        } catch (SQLException ex) {
-            outputArea.setText("Error fetching case: " + ex.getMessage());
+            outputArea.setText(output.toString());
+        } else {
+            outputArea.setText("Case not found with ID: " + caseId);
         }
+    } catch (SQLException ex) {
+        outputArea.setText("Error fetching case: " + ex.getMessage());
     }
+}
+
 
     private void addCase() {
         JTextField numberField = new JTextField();
@@ -295,23 +311,38 @@ public class LawFirmAppGUI extends JFrame {
     }
 
     private void viewAllCases() {
-        try {
-            List<Case> cases = connection.getAllCases();
-            StringBuilder output = new StringBuilder();
-            for (Case caseObj : cases) {
-                output.append("Case ID: ").append(caseObj.getCase_id()).append("\n");
-                output.append("Case Number: ").append(caseObj.getCase_number()).append("\n");
-                output.append("Title: ").append(caseObj.getCase_title()).append("\n");
-                output.append("Description: ").append(caseObj.getCase_description()).append("\n");
-                output.append("Status: ").append(caseObj.getCase_status()).append("\n");
-                output.append("Date Filed: ").append(caseObj.getDate_filed()).append("\n");
-                output.append("Date Closed: ").append(caseObj.getDate_closed()).append("\n\n");
+    try {
+        List<Case> cases = connection.getAllCases();
+        StringBuilder output = new StringBuilder();
+        for (Case caseObj : cases) {
+            output.append("Case ID: ").append(caseObj.getCase_id()).append("\n");
+            output.append("Case Number: ").append(caseObj.getCase_number()).append("\n");
+            output.append("Title: ").append(caseObj.getCase_title()).append("\n");
+            output.append("Description: ").append(caseObj.getCase_description()).append("\n");
+            output.append("Status: ").append(caseObj.getCase_status()).append("\n");
+            output.append("Date Filed: ").append(caseObj.getDate_filed()).append("\n");
+            output.append("Date Closed: ").append(caseObj.getDate_closed()).append("\n");
+
+            // Get the associated client
+            Client client = caseObj.getClient_id();
+            if (client != null) {
+                output.append("Client Information:\n");
+                output.append("Client ID: ").append(client.getClient_id()).append("\n");
+                output.append("Name: ").append(client.getClient_name()).append("\n");
+                output.append("Address: ").append(client.getClient_address()).append("\n");
+                output.append("Phone: ").append(client.getClient_phone()).append("\n");
+                output.append("Email: ").append(client.getClient_email()).append("\n");
+            } else {
+                output.append("No client information found for this case.\n");
             }
-            outputArea.setText(output.toString());
-        } catch (SQLException ex) {
-            outputArea.setText("Error fetching cases: " + ex.getMessage());
+            output.append("\n");
         }
+        outputArea.setText(output.toString());
+    } catch (SQLException ex) {
+        outputArea.setText("Error fetching cases: " + ex.getMessage());
     }
+}
+
 
     private JFormattedTextField createDateFormattedTextField() {
         JFormattedTextField textField = new JFormattedTextField(createFormatter("####-##-##"));
