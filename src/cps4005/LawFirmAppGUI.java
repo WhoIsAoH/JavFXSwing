@@ -64,54 +64,41 @@ public class LawFirmAppGUI extends JFrame {
         JButton updateDocumentButton = new JButton("Update Document");
         JButton deleteDocumentButton = new JButton("Delete Document");
 
-        // Create panels
-        JPanel clientPanel = new JPanel();
-        clientPanel.add(viewClientButton);
-        clientPanel.add(addClientButton);
-        clientPanel.add(deleteClientButton);
-        clientPanel.add(viewAllClientsButton);
-        clientPanel.add(updateClientButton);
+        JPanel buttonPanel = new JPanel(new GridLayout(4, 5, 10, 3)); // 4 rows, 5 columns with gaps
 
-        JPanel casePanel = new JPanel();
-        casePanel.add(viewCaseButton);
-        casePanel.add(addCaseButton);
-        casePanel.add(deleteCaseButton);
-        casePanel.add(viewAllCasesButton);
-        casePanel.add(updateCaseButton);
+        // Add client buttons to panel
+        buttonPanel.add(addClientButton);
+        buttonPanel.add(viewClientButton);
+        buttonPanel.add(viewAllClientsButton);
+        buttonPanel.add(updateClientButton);
+        buttonPanel.add(deleteClientButton);
 
-        JPanel datePanel = new JPanel();
-        datePanel.add(addDateButton);
-        datePanel.add(viewDateButton);
-        datePanel.add(viewAllDatesButton);
-        datePanel.add(updateDateButton);
-        datePanel.add(deleteDateButton);
+        // Add case buttons to panel
+        buttonPanel.add(addCaseButton);
+        buttonPanel.add(viewCaseButton);
+        buttonPanel.add(viewAllCasesButton);
+        buttonPanel.add(updateCaseButton);
+        buttonPanel.add(deleteCaseButton);
 
-        JPanel documentPanel = new JPanel();
-        documentPanel.add(addDocumentButton);
-        documentPanel.add(viewDocumentButton);
-        documentPanel.add(viewAllDocumentsButton);
-        documentPanel.add(updateDocumentButton);
-        documentPanel.add(deleteDocumentButton);
+        // Add date buttons to panel
+        buttonPanel.add(addDateButton);
+        buttonPanel.add(viewDateButton);
+        buttonPanel.add(viewAllDatesButton);
+        buttonPanel.add(updateDateButton);
+        buttonPanel.add(deleteDateButton);
 
-        // Create line break panels
-        JPanel lineBreak1 = new JPanel();
-        lineBreak1.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        JPanel lineBreak2 = new JPanel();
-        lineBreak2.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        JPanel lineBreak3 = new JPanel();
-        lineBreak3.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        // Add document buttons to panel
+        buttonPanel.add(addDocumentButton);
+        buttonPanel.add(viewDocumentButton);
+        buttonPanel.add(viewAllDocumentsButton);
+        buttonPanel.add(updateDocumentButton);
+        buttonPanel.add(deleteDocumentButton);
 
         JScrollPane scrollPane = new JScrollPane(outputArea);
 
-        // Add panels to the frame
+        // Add components to the frame
         getContentPane().setLayout(new BorderLayout());
-        getContentPane().add(clientPanel, BorderLayout.NORTH);
-        getContentPane().add(lineBreak1, BorderLayout.CENTER); // Line break after client buttons
-        getContentPane().add(casePanel, BorderLayout.CENTER);
-        getContentPane().add(lineBreak2, BorderLayout.WEST); // Line break after case buttons
-        getContentPane().add(datePanel, BorderLayout.WEST);
-        getContentPane().add(lineBreak3, BorderLayout.EAST); // Line break after date buttons
-        getContentPane().add(documentPanel, BorderLayout.EAST);
+        getContentPane().add(buttonPanel, BorderLayout.CENTER);
         getContentPane().add(scrollPane, BorderLayout.SOUTH);
 
         // Add action listeners to client buttons
