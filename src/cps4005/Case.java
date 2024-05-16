@@ -11,6 +11,7 @@ import java.sql.Date;
  * @author ajayp
  */
 public class Case {
+
     private int case_id;
     private String case_number;
     private String case_title;
@@ -29,9 +30,6 @@ public class Case {
 //        this.date_filed = date_filed;
 //        this.date_closed = date_closed;
 //    }
-    
-    
-
     public Case(int case_id, String case_number, String case_title, String case_description, String case_status, Date date_filed, Date date_closed, Client client_id) {
         this.case_id = case_id;
         this.case_number = case_number;
@@ -106,7 +104,5 @@ public class Case {
     public void setClient_id(Client client_id) {
         this.client_id = client_id;
     }
-    
-    
-}
 
+}

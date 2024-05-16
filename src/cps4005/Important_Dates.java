@@ -11,6 +11,7 @@ import java.sql.Date;
  * @author ajayp
  */
 public class Important_Dates {
+
     private int date_id;
     private Case case_id;
     private Date event_date;
@@ -54,6 +55,5 @@ public class Important_Dates {
     public void setEvent_description(String event_description) {
         this.event_description = event_description;
     }
-    
-    
+
 }

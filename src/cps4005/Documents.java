@@ -9,8 +9,9 @@ package cps4005;
  * @author ajayp
  */
 public class Documents {
+
     private int document_id;
-        private Case case_id;
+    private Case case_id;
     private String document_name;
     private String document_type;
     private String document_path;
@@ -21,9 +22,6 @@ public class Documents {
 //        this.document_type = document_type;
 //        this.document_path = document_path;
 //    }
-
-    
-    
     public Documents(int document_id, Case case_id, String document_name, String document_type, String document_path) {
         this.document_id = document_id;
         this.case_id = case_id;
@@ -32,8 +30,6 @@ public class Documents {
         this.document_path = document_path;
     }
 
-    
-    
 //    public Documents(int document_id, String document_name, String document_type, String document_path, Case case_id) {
 //        this.document_id = document_id;
 //        this.document_name = document_name;
@@ -41,7 +37,6 @@ public class Documents {
 //        this.document_path = document_path;
 //        this.case_id = case_id;
 //    }
-
     public int getDocument_id() {
         return document_id;
     }
@@ -81,6 +76,5 @@ public class Documents {
     public void setCase_id(Case case_id) {
         this.case_id = case_id;
     }
-    
-    
+
 }

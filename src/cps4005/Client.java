@@ -9,13 +9,14 @@ package cps4005;
  * @author ajayp
  */
 public class Client {
+
     private int client_id;
     private String client_name;
     private String client_address;
     private String client_phone;
     private String client_email;
-  
-    public Client(int client_id, String client_name, String client_address, String client_phone, String client_email){
+
+    public Client(int client_id, String client_name, String client_address, String client_phone, String client_email) {
         this.client_id = client_id;
         this.client_name = client_name;
         this.client_address = client_address;
