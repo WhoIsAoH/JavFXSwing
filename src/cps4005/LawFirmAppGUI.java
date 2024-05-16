@@ -1,14 +1,13 @@
 package cps4005;
+
 import javax.swing.*;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
-import javax.swing.text.MaskFormatter;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.sql.Date;
 import java.util.List;
 
 public class LawFirmAppGUI extends JFrame {
@@ -33,12 +32,14 @@ public class LawFirmAppGUI extends JFrame {
         JButton addClientButton = new JButton("Add Client");
         JButton deleteClientButton = new JButton("Delete Client");
         JButton viewAllClientsButton = new JButton("View All Clients");
+        JButton updateClientButton = new JButton("Update Client");
 
         // Create buttons for case actions
         JButton viewCaseButton = new JButton("View Case");
         JButton addCaseButton = new JButton("Add Case");
         JButton deleteCaseButton = new JButton("Delete Case");
         JButton viewAllCasesButton = new JButton("View All Cases");
+        JButton updateCaseButton = new JButton("Update Case");
 
         // Create panels
         JPanel clientPanel = new JPanel();
@@ -46,12 +47,14 @@ public class LawFirmAppGUI extends JFrame {
         clientPanel.add(addClientButton);
         clientPanel.add(deleteClientButton);
         clientPanel.add(viewAllClientsButton);
+        clientPanel.add(updateClientButton);
 
         JPanel casePanel = new JPanel();
         casePanel.add(viewCaseButton);
         casePanel.add(addCaseButton);
         casePanel.add(deleteCaseButton);
         casePanel.add(viewAllCasesButton);
+        casePanel.add(updateCaseButton);
 
         JScrollPane scrollPane = new JScrollPane(outputArea);
 
@@ -90,6 +93,13 @@ public class LawFirmAppGUI extends JFrame {
             }
         });
 
+        updateClientButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                askForClientId("Update");
+            }
+        });
+
         // Add action listeners to case buttons
         viewCaseButton.addActionListener(new ActionListener() {
             @Override
@@ -118,6 +128,13 @@ public class LawFirmAppGUI extends JFrame {
                 viewAllCases();
             }
         });
+
+        updateCaseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                askForCaseId("Update");
+            }
+        });
     }
 
     private void askForClientId(String action) {
@@ -130,6 +147,8 @@ public class LawFirmAppGUI extends JFrame {
                 viewClient(clientId);
             } else if (action.equals("Delete")) {
                 deleteClient(clientId);
+            } else if (action.equals("Update")) {
+                updateClient(clientId);
             }
         }
     }
@@ -144,6 +163,8 @@ public class LawFirmAppGUI extends JFrame {
                 viewCase(caseId);
             } else if (action.equals("Delete")) {
                 deleteCase(caseId);
+            } else if (action.equals("Update")) {
+                updateCase(caseId);
             }
         }
     }
@@ -202,6 +223,44 @@ public class LawFirmAppGUI extends JFrame {
         }
     }
 
+    private void updateClient(int clientId) {
+        JTextField nameField = new JTextField();
+        JTextField addressField = new JTextField();
+        JTextField phoneField = new JTextField();
+        JTextField emailField = new JTextField();
+
+        Object[] fields = {
+                "Name:", nameField,
+                "Address:", addressField,
+                "Phone:", phoneField,
+                "Email:", emailField
+        };
+
+        try {
+            Client client = connection.getClient(clientId);
+            if (client != null) {
+                nameField.setText(client.getClient_name());
+                addressField.setText(client.getClient_address());
+                phoneField.setText(client.getClient_phone());
+                emailField.setText(client.getClient_email());
+
+                int result = JOptionPane.showConfirmDialog(null, fields, "Update Client", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_OPTION) {
+                    String name = nameField.getText();
+                    String address = addressField.getText();
+                    String phone = phoneField.getText();
+                    String email = emailField.getText();
+                    connection.updateClient(clientId, name, address, phone, email);
+                    outputArea.setText("Client updated successfully.");
+                }
+            } else {
+                outputArea.setText("No client found with the ID " + clientId);
+            }
+        } catch (SQLException ex) {
+            outputArea.setText("Error updating client: " + ex.getMessage());
+        }
+    }
+
     private void viewAllClients() {
         try {
             List<Client> clients = connection.getAllClients();
@@ -231,7 +290,7 @@ public class LawFirmAppGUI extends JFrame {
             output.append("Status: ").append(caseObj.getCase_status()).append("\n");
             output.append("Date Filed: ").append(caseObj.getDate_filed()).append("\n");
             output.append("Date Closed: ").append(caseObj.getDate_closed()).append("\n");
-               System.out.println(caseObj.getClient_id());
+
             // Get the associated client
             Client client = caseObj.getClient_id();
             if (client != null) {
@@ -253,64 +312,123 @@ public class LawFirmAppGUI extends JFrame {
     }
 }
 
+private void addCase() {
+    JTextField numberField = new JTextField();
+    JTextField titleField = new JTextField();
+    JTextField descriptionField = new JTextField();
+    JTextField statusField = new JTextField();
+    JFormattedTextField dateFiledField = createDateFormattedTextField();
+    JFormattedTextField dateClosedField = createDateFormattedTextField();
 
-    private void addCase() {
-        JTextField numberField = new JTextField();
-        JTextField titleField = new JTextField();
-        JTextField descriptionField = new JTextField();
-        JTextField statusField = new JTextField();
-        JFormattedTextField dateFiledField = createDateFormattedTextField();
-        JFormattedTextField dateClosedField = createDateFormattedTextField();
-
-        JComboBox<String> clientDropdown = new JComboBox<>();
-        try {
-            List<Client> clients = connection.getAllClients();
-            for (Client client : clients) {
-                clientDropdown.addItem(client.getClient_name());
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error fetching clients: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    JComboBox<String> clientDropdown = new JComboBox<>();
+    try {
+        List<Client> clients = connection.getAllClients();
+        for (Client client : clients) {
+            clientDropdown.addItem(client.getClient_name());
         }
-
-        Object[] fields = {
-                "Case Number:", numberField,
-                "Title:", titleField,
-                "Description:", descriptionField,
-                "Status:", statusField,
-                "Date Filed (YYYY-MM-DD):", dateFiledField,
-                "Date Closed (YYYY-MM-DD):", dateClosedField,
-                "Client:", clientDropdown
-        };
-
-        int result = JOptionPane.showConfirmDialog(null, fields, "Add Case", JOptionPane.OK_CANCEL_OPTION);
-        if (result == JOptionPane.OK_OPTION) {
-            String number = numberField.getText();
-            String title = titleField.getText();
-            String description = descriptionField.getText();
-            String status = statusField.getText();
-            String dateFiled = dateFiledField.getText();
-            String dateClosed = dateClosedField.getText();
-            int clientId = clientDropdown.getSelectedIndex() + 1; // Index starts from 0
-
-            try {
-                connection.addCase(number, title, description, status, dateFiled, dateClosed, clientId);
-                outputArea.setText("Case added successfully.");
-            } catch (SQLException ex) {
-                outputArea.setText("Error adding case: " + ex.getMessage());
-            }
-        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(null, "Error fetching clients: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    private void deleteCase(int caseId) {
+    Object[] fields = {
+            "Case Number:", numberField,
+            "Title:", titleField,
+            "Description:", descriptionField,
+            "Status:", statusField,
+            "Date Filed (YYYY-MM-DD):", dateFiledField,
+            "Date Closed (YYYY-MM-DD):", dateClosedField,
+            "Client:", clientDropdown
+    };
+
+    int result = JOptionPane.showConfirmDialog(null, fields, "Add Case", JOptionPane.OK_CANCEL_OPTION);
+    if (result == JOptionPane.OK_OPTION) {
+        String number = numberField.getText();
+        String title = titleField.getText();
+        String description = descriptionField.getText();
+        String status = statusField.getText();
+        String dateFiled = dateFiledField.getText();
+        String dateClosed = dateClosedField.getText();
+        int clientId = clientDropdown.getSelectedIndex() + 1; // Index starts from 0
+
         try {
-            connection.deleteCase(caseId);
-            outputArea.setText("Case deleted successfully.");
+            connection.addCase(number, title, description, status, dateFiled, dateClosed, clientId);
+            outputArea.setText("Case added successfully.");
         } catch (SQLException ex) {
-            outputArea.setText("Error deleting case: " + ex.getMessage());
+            outputArea.setText("Error adding case: " + ex.getMessage());
         }
     }
+}
 
-    private void viewAllCases() {
+private void deleteCase(int caseId) {
+    try {
+        connection.deleteCase(caseId);
+        outputArea.setText("Case deleted successfully.");
+    } catch (SQLException ex) {
+        outputArea.setText("Error deleting case: " + ex.getMessage());
+    }
+}
+
+private void updateCase(int caseId) {
+    JTextField numberField = new JTextField();
+    JTextField titleField = new JTextField();
+    JTextField descriptionField = new JTextField();
+    JTextField statusField = new JTextField();
+    JFormattedTextField dateFiledField = createDateFormattedTextField();
+    JFormattedTextField dateClosedField = createDateFormattedTextField();
+
+    JComboBox<String> clientDropdown = new JComboBox<>();
+    try {
+        List<Client> clients = connection.getAllClients();
+        for (Client client : clients) {
+            clientDropdown.addItem(client.getClient_name());
+        }
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(null, "Error fetching clients: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    Object[] fields = {
+            "Case Number:", numberField,
+            "Title:", titleField,
+            "Description:", descriptionField,
+            "Status:", statusField,
+            "Date Filed (YYYY-MM-DD):", dateFiledField,
+            "Date Closed (YYYY-MM-DD):", dateClosedField,
+            "Client:", clientDropdown
+    };
+
+    try {
+        Case existingCase = connection.getCase(caseId);
+        if (existingCase != null) {
+            numberField.setText(existingCase.getCase_number());
+            titleField.setText(existingCase.getCase_title());
+            descriptionField.setText(existingCase.getCase_description());
+            statusField.setText(existingCase.getCase_status());
+            dateFiledField.setText(existingCase.getDate_filed().toString());
+            dateClosedField.setText(existingCase.getDate_closed().toString());
+
+            int result = JOptionPane.showConfirmDialog(null, fields, "Update Case", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                String number = numberField.getText();
+                String title = titleField.getText();
+                String description = descriptionField.getText();
+                String status = statusField.getText();
+                Date dateFiled = Date.valueOf(dateFiledField.getText());
+                Date dateClosed = Date.valueOf(dateFiledField.getText());
+
+                int clientId = clientDropdown.getSelectedIndex() + 1; // Index starts from 0
+
+                connection.updateCase(caseId, number, title, description, status, dateFiled, dateClosed);
+                outputArea.setText("Case updated successfully.");
+            }
+        } else {
+            outputArea.setText("No case found with the ID " + caseId);
+        }
+    } catch (SQLException ex) {
+        outputArea.setText("Error updating case: " + ex.getMessage());
+    }
+}
+
+private void viewAllCases() {
     try {
         List<Case> cases = connection.getAllCases();
         StringBuilder output = new StringBuilder();
