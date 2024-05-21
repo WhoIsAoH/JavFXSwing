@@ -1,36 +1,23 @@
 package com.grg.cps4005oop2308819;
 
 import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-
 import org.junit.jupiter.api.BeforeEach;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 class LawFirmAppTest {
   private LawFirmApp lawFirmApp;
-  private Scanner mockScanner;
   private DatabaseConnection mockConnection;
 
   @BeforeEach
   public void setUp() {
-    mockScanner = mock(Scanner.class);
     mockConnection = mock(DatabaseConnection.class);
     lawFirmApp = new LawFirmApp(mockConnection);
   }
