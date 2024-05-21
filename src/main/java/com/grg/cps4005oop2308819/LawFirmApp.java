@@ -2,33 +2,24 @@ package com.grg.cps4005oop2308819;
 
 import javax.swing.*;
 import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
 import java.sql.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class LawFirmApp {
   private JTextArea outputArea;
-
-  // Other methods and properties...
-
   public String getOutputAreaText() {
     return outputArea.getText();
   }
-  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
   private DatabaseConnection connection;
   private Scanner scanner;
 
   public LawFirmApp() {
   }
-
-
   public LawFirmApp(DatabaseConnection conn) {
     this.connection = conn;
     this.scanner = new Scanner(System.in);
   }
-
   public static void main(String[] args) throws SQLException {
     Scanner scanner = new Scanner(System.in);
 
