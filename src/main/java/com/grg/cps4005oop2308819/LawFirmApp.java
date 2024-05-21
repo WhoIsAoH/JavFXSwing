@@ -1,5 +1,6 @@
 package com.grg.cps4005oop2308819;
 
+import javax.swing.*;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.sql.Date;
@@ -7,7 +8,13 @@ import java.util.List;
 import java.util.Scanner;
 
 public class LawFirmApp {
+  private JTextArea outputArea;
 
+  // Other methods and properties...
+
+  public String getOutputAreaText() {
+    return outputArea.getText();
+  }
   DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private DatabaseConnection connection;
@@ -15,6 +22,7 @@ public class LawFirmApp {
 
   public LawFirmApp() {
   }
+
 
   public LawFirmApp(DatabaseConnection conn) {
     this.connection = conn;
@@ -220,7 +228,7 @@ public class LawFirmApp {
     }
   }
 
-  private void viewAllClient() {
+  public void viewAllClient() {
     try {
       System.out.println("List of Clients:");
       for (Client client : connection.getAllClients()) {
@@ -235,7 +243,7 @@ public class LawFirmApp {
     }
   }
 
-  private void updateClient() {
+  public void updateClient() {
     System.out.print("Enter client ID: ");
     int clientId = scanner.nextInt();
     scanner.nextLine();
@@ -332,7 +340,7 @@ public class LawFirmApp {
     }
   }
 
-  private void viewAllCase() {
+  public void viewAllCase() {
     try {
       System.out.println("List of Cases:");
       for (Case caseObject : connection.getAllCases()) {
@@ -665,5 +673,6 @@ public class LawFirmApp {
       System.out.println("Error deleting document: " + e.getMessage());
     }
   }
+
 
 }
